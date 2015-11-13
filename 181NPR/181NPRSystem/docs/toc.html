@@ -1,0 +1,518 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<title>181 North Place Residences- Table of Contents</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 4.6.2.573">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/silver-theme/jquery-ui-1.8.12.custom.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/dynatree/chm/ui.dynatree.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+    <link type="text/css" rel="stylesheet" media="all" href="css/toc.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#tabs .ui-widget-header
+		{
+			background-color: #EFEFEF;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/jquery.dynatree.min.js"></script>
+	<script type="text/javascript" src="js/hndjsse.js"></script>
+	<script type="text/javascript">
+	
+		window.bSearchDataLoaded = false;
+		var sHelpIdToActivate = '';
+	
+		$(document).ready(function()
+		{
+			var sAnchorName = '';
+			try { sAnchorName = top.location.href.substring(top.location.href.lastIndexOf("#") + 1, top.location.href.length); }
+			catch(err) { sAnchorName = ''; }
+			var nSelectedTab = 0;
+			if (sAnchorName == '_index') nSelectedTab = 1
+			else if (sAnchorName == '_search') nSelectedTab = 2;			
+			$("#tabs").tabs({
+				selected: nSelectedTab,
+				select: function(event, ui) { HideKwPopup(); }
+			});
+			
+			// Toc
+			if ($("#tab-toc").length) {
+				$("#tab-toc").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/chm/',
+					onActivate: function(node){
+						if ($("#tab-keywords").length && $("#tab-keywords").dynatree && $("#tab-keywords").dynatree("getTree") && $("#tab-keywords").dynatree("getTree").activateKey)
+							$("#tab-keywords").dynatree("getTree").activateKey(null);
+						if(node.data.href && node.data.href != '#'){
+							window.open(node.data.href, node.data.target);
+						}
+					}
+				});
+				// Expand all nodes if required
+				$("#tab-toc").dynatree("getRoot").visit(function(node){
+						node.expand(true);
+					});
+				// Select the active help id
+				if (sHelpIdToActivate != '') $("#tab-toc").dynatree("getTree").activateKey(sHelpIdToActivate);
+			}
+			
+			// Keywords
+			
+			if ($("#tab-keywords").length) {
+				$("#tab-keywords").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/chm/',
+					onClick: function(node, event){
+						HideKwPopup();
+						if (node.data && node.data.click)
+						{
+							var aRefList = null;
+							eval('aRefList=' + node.data.click);
+							if (ShowKwPopup(node.li, aRefList))
+							{
+								if ($("#tab-toc") && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").activateKey)
+									$("#tab-toc").dynatree("getTree").activateKey(null);
+								if(node.data.href && node.data.href != '#'){
+									window.open(node.data.href, node.data.target);
+								}
+							}
+						}
+					}
+				});
+				// Expand all nodes if required
+				$("#tab-keywords").dynatree("getRoot").visit(function(node){
+						node.expand(true);
+					});
+				}
+			
+			// Load search data
+			(function() {
+				var se = document.createElement('script'); se.type = 'text/javascript'; se.async = true;
+				se.src = 'js/hndsd.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(se, s);
+			})();
+		});
+		
+		$('body').click(function() {
+			HideKwPopup();
+		});
+		
+		function SelectTocItem(sHelpId)
+		{
+			if ($("#tab-toc").length && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").getNodeByKey) {
+				$("#tab-toc").dynatree("getTree").getNodeByKey(sHelpId).activateSilently();
+			}
+			else {
+				sHelpIdToActivate = sHelpId;
+			}
+		}
+		
+		function HideKwPopup()
+		{
+			if($("#popupMenu")) $("#popupMenu").remove();
+		}
+		
+		function ShowKwPopup(oSender, aLinks)
+		{
+			HideKwPopup();
+			if (!aLinks || !aLinks.length || aLinks.length == 0) return false
+			else if (aLinks.length == 1) return true
+			else
+			{
+				var oParentDiv = document.createElement("DIV");
+				oParentDiv.id = "popupMenu";
+				var oLink = null;
+				// Close button
+				oLink = document.createElement("SPAN");
+				oLink.className = "close-button";
+				oLink.innerHTML = "X";
+				oLink.href = "#";
+				oLink.onclick = HideKwPopup;
+				oParentDiv.appendChild(oLink);
+				// Items
+				for (var nCnt=0; nCnt<aLinks.length; nCnt++)
+				{
+					oLink = document.createElement("A");
+					oLink.innerHTML = aLinks[nCnt][0];
+					oLink.href = aLinks[nCnt][1];
+					oLink.target = "FrameMain";
+					oLink.onclick = HideKwPopup;
+					oParentDiv.appendChild(oLink);
+				}
+				document.body.appendChild(oParentDiv);
+				var pos = $(oSender).offset(); 
+				var height = $(oSender).height();
+				$(oParentDiv).css({
+					"left": (pos.left+20) + "px",
+					"top": (pos.top + height + 5) + "px"
+				});
+				$(oParentDiv).show();
+				return false;
+			}
+		}
+		
+		function PerformSearch()
+		{
+			if (!window.bSearchDataLoaded) {
+				$("#search_results").html("Search engine data hasn't been fully loaded yet or an error occurred while loading it. This usually happens when documentation is browsed locally.");
+				return;
+			}
+			sValue = $("#search_value").val();
+			$("#search_results").html('Searching...');
+			var oSearchEngine = new HndJsSe;
+			oSearchEngine.ParseInput(sValue);			
+			oSearchEngine.PerformSearch();
+			if (!oSearchEngine.aResults || !oSearchEngine.aResults.length)
+			{
+				$("#search_results").html('No results found.');
+			}
+			else
+			{
+				$("#search_results").html('<div id="search_results_content"></div>');
+				var oUl = $("#search_results_content").append("<ul id='lr'></ul>").find("ul");
+				for (var nCnt = 0; nCnt < oSearchEngine.aResults.length; nCnt++)
+				{
+					if (oSearchEngine.aResults[nCnt][0] < aTl.length)
+					{
+						oUl.append("<li><a href='" + aTl[oSearchEngine.aResults[nCnt][0]][0] + "?search=" + escape(sValue) + "' target='FrameMain'>" + unescape(aTl[oSearchEngine.aResults[nCnt][0]][1]) + "</a></li>");
+					}
+				}
+				// Tree
+				$("#search_results_content").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/chm/',
+					onActivate: function(node){
+						if ($("#search_results_content") && $("#search_results_content").dynatree && $("#search_results_content").dynatree("getTree") && $("#search_results_content").dynatree("getTree").activateKey)
+							$("#search_results_content").dynatree("getTree").activateKey(null);
+						if(node.data.href && node.data.href != '#'){
+							window.open(node.data.href, node.data.target);
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+
+<body>
+
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-toc">Contents</a></li>
+			<li><a href="#tab-keywords">Index</a></li>
+			<li><a href="#tab-search">Search</a></li>
+			</ul>
+		<div id="tab-toc">
+			<ul id="toc" class="">
+
+				<li class="folder" id="QuickStart" data="">
+							<a
+							href="QuickStart.html"
+							target="FrameMain">
+								Quick Start</a>
+
+				<ul><li class="" id="LaunchingServer" data="">
+							<a
+							href="LaunchingServer.html"
+							target="FrameMain">
+								Launching Server</a>
+
+				</li><li class="" id="LaunchingMonitoringSystem" data="">
+							<a
+							href="LaunchingMonitoringSystem.html"
+							target="FrameMain">
+								Launching Monitoring System</a>
+
+				</li><li class="" id="LaunchingLobby" data="">
+							<a
+							href="LaunchingLobby.html"
+							target="FrameMain">
+								Launching Lobby </a>
+
+				</li><li class="" id="LaunchingBackupandRecovery" data="">
+							<a
+							href="LaunchingBackupandRecovery.html"
+							target="FrameMain">
+								Launching Back-up and Recovery</a>
+
+				</li><li class="folder" id="Admin" data="">
+							<a
+							href="Admin.html"
+							target="FrameMain">
+								Admin</a>
+
+				<ul><li class="" id="Login" data="">
+							<a
+							href="Login.html"
+							target="FrameMain">
+								Login</a>
+
+				</li><li class="" id="AddAdmin" data="">
+							<a
+							href="AddAdmin.html"
+							target="FrameMain">
+								Add Admin</a>
+
+				</li><li class="" id="EditProfile" data="">
+							<a
+							href="EditProfile.html"
+							target="FrameMain">
+								Edit Profile</a>
+
+				</li><li class="" id="ChangePassword" data="">
+							<a
+							href="ChangePassword.html"
+							target="FrameMain">
+								Change Password</a>
+
+				</li><li class="" id="Logout" data="">
+							<a
+							href="Logout.html"
+							target="FrameMain">
+								Logout</a>
+
+				</li><li class="" id="iLogbook" data="">
+							<a
+							href="iLogbook.html"
+							target="FrameMain">
+								iLogbook</a>
+
+				</li><li class="folder" id="AdminPrivileges" data="">
+							<a
+							href="AdminPrivileges.html"
+							target="FrameMain">
+								Admin Privileges</a>
+
+				<ul><li class="" id="Accounts" data="">
+							<a
+							href="Accounts.html"
+							target="FrameMain">
+								Accounts</a>
+
+				</li><li class="" id="ManageFurniture" data="">
+							<a
+							href="ManageFurniture.html"
+							target="FrameMain">
+								Manage Furniture</a>
+
+				</li><li class="" id="RoomRate" data="">
+							<a
+							href="RoomRate.html"
+							target="FrameMain">
+								Room Rate</a>
+
+				</li><li class="" id="ShuttleRate" data="">
+							<a
+							href="ShuttleRate.html"
+							target="FrameMain">
+								Shuttle Rate</a>
+
+				</li><li class="" id="TransientRate" data="">
+							<a
+							href="TransientRate.html"
+							target="FrameMain">
+								Transient Rate</a>
+
+				</li></ul></li><li class="folder" id="Notification" data="">
+							<a
+							href="Notification.html"
+							target="FrameMain">
+								Notification</a>
+
+				<ul><li class="" id="SentBox" data="">
+							<a
+							href="SentBox.html"
+							target="FrameMain">
+								Sent Box</a>
+
+				</li></ul></li></ul></li><li class="folder" id="Lobby" data="">
+							<a
+							href="Lobby.html"
+							target="FrameMain">
+								Lobby</a>
+
+				<ul><li class="folder" id="TimeinandTimeoutofresidents" data="">
+							<a
+							href="TimeinandTimeoutofresidents.html"
+							target="FrameMain">
+								Time-in and Time-out of residents</a>
+
+				<ul><li class="" id="RegisterFingerprint" data="">
+							<a
+							href="RegisterFingerprint.html"
+							target="FrameMain">
+								Register Fingerprint</a>
+
+				</li></ul></li><li class="" id="VisitorsLogin" data="">
+							<a
+							href="VisitorsLogin.html"
+							target="FrameMain">
+								Visitors Log-in</a>
+
+				</li><li class="" id="VisitorsLogout" data="">
+							<a
+							href="VisitorsLogout.html"
+							target="FrameMain">
+								Visitors Log-out</a>
+
+				</li><li class="" id="ResidentSearch" data="">
+							<a
+							href="ResidentSearch.html"
+							target="FrameMain">
+								Resident Search</a>
+
+				</li><li class="" id="PermittousetheBuildingPremises" data="">
+							<a
+							href="PermittousetheBuildingPremises.html"
+							target="FrameMain">
+								Permit to use the Building Premises</a>
+
+				</li></ul></li><li class="folder" id="Resident" data="">
+							<a
+							href="Resident.html"
+							target="FrameMain">
+								Resident</a>
+
+				<ul><li class="folder" id="Reservation" data="">
+							<a
+							href="Reservation.html"
+							target="FrameMain">
+								Reservation</a>
+
+				<ul><li class="" id="iFloorPlan" data="">
+							<a
+							href="iFloorPlan.html"
+							target="FrameMain">
+								iFloorPlan</a>
+
+				</li></ul></li><li class="folder" id="Registration" data="">
+							<a
+							href="Registration.html"
+							target="FrameMain">
+								Registration</a>
+
+				<ul><li class="" id="Addfurniture" data="">
+							<a
+							href="Addfurniture.html"
+							target="FrameMain">
+								Add furniture</a>
+
+				</li><li class="" id="AddGadget" data="">
+							<a
+							href="AddGadget.html"
+							target="FrameMain">
+								Add Gadget</a>
+
+				</li></ul></li><li class="" id="Activation" data="">
+							<a
+							href="Activation.html"
+							target="FrameMain">
+								Activation</a>
+
+				</li><li class="folder" id="Billing" data="">
+							<a
+							href="Billing.html"
+							target="FrameMain">
+								Billing</a>
+
+				<ul><li class="" id="StatementofAccount" data="">
+							<a
+							href="StatementofAccount.html"
+							target="FrameMain">
+								Statement of Account</a>
+
+				</li><li class="" id="PaymentRemittance" data="">
+							<a
+							href="PaymentRemittance.html"
+							target="FrameMain">
+								Payment Remittance</a>
+
+				</li></ul></li><li class="folder" id="EditResidentInformation" data="">
+							<a
+							href="EditResidentInformation.html"
+							target="FrameMain">
+								Edit Resident Information</a>
+
+				<ul><li class="folder" id="ViewProfile" data="">
+							<a
+							href="ViewProfile.html"
+							target="FrameMain">
+								View Profile</a>
+
+				<ul><li class="" id="EditProfile1" data="">
+							<a
+							href="EditProfile1.html"
+							target="FrameMain">
+								Edit Profile</a>
+
+				</li><li class="" id="EditFurnitureandGadget" data="">
+							<a
+							href="EditFurnitureandGadget.html"
+							target="FrameMain">
+								Edit Furniture and Gadget</a>
+
+				</li></ul></li><li class="" id="ChangeRoom" data="">
+							<a
+							href="ChangeRoom.html"
+							target="FrameMain">
+								Change Room</a>
+
+				</li></ul></li></ul></li><li class="" id="Transient" data="">
+							<a
+							href="Transient.html"
+							target="FrameMain">
+								Transient</a>
+
+				</li><li class="folder" id="ReportGeneration" data="">
+							<a
+							href="ReportGeneration.html"
+							target="FrameMain">
+								Report Generation</a>
+
+				<ul><li class="" id="Archives" data="">
+							<a
+							href="Archives.html"
+							target="FrameMain">
+								Archives</a>
+
+				</li></ul></li><li class="" id="BackupandRecovery" data="">
+							<a
+							href="BackupandRecovery.html"
+							target="FrameMain">
+								Back-up and Recovery</a>
+
+				</li></ul></li></ul>
+		</div>
+		
+		<div id="tab-keywords">
+			<ul id="keywords">
+
+				</ul>
+		</div>
+		
+		<div id="tab-search">
+			<form onsubmit="PerformSearch(); return false;">
+				<label for="search_value">Search:</label>
+				<input id="search_value" name="search_value"></input>
+				<input type="submit" value="Search"/>
+			</form>
+			<div id="search_results"></div>
+		</div>
+		
+		</div>
+    
+</body>
+
+</html>
+

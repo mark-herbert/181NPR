@@ -1,0 +1,503 @@
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ *
+ * @author Mark Herbert Cabuang
+ */
+public class BillingArchiveFrame extends javax.swing.JFrame {
+
+    /**
+     * Creates new form BillingArchiveFrame
+     */
+    private String username = "root";
+    private String password = "";
+    private Connection connection;
+    private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
+    private DefaultTableModel model;
+    private final NPRInterface client;;
+    private final String user;
+    private String path = "";
+    public BillingArchiveFrame(NPRInterface client, String user) throws IOException {
+        initComponents();
+        this.client = client;
+        this.user = user;
+        //account summary
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("dir\\defaults.txt"));
+            try {
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
+
+                while (line != null) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                    line = br.readLine();
+                }
+                path = sb.toString().trim();
+            } catch (IOException ex) {
+//                Logger.getLogger(AdminArchiveFrame.class.getName()).log(Level.SEVERE, null, ex);
+                new MessageDialog().error(this, ex.getMessage());
+            } finally {
+                br.close();
+            }
+            model = (DefaultTableModel) residentpersonalinfotable.getModel();
+            model.getDataVector().removeAllElements();
+            model.fireTableDataChanged();
+            for(ResidentImpl r : client.getResidentBillingSummary()){
+                model.addRow(new Object[]{
+                    r.getLName() + ", " + r.getFName(),
+                    "resident",
+                    client.getAdminName(r.getGender()),
+                    r.getFullName(),
+                    r.getBirthdate(),
+                    r.getAddress()
+                });
+            }
+            for(TransientImpl t : client.getTransientBillingSummary()){
+                model.addRow(new Object[]{
+                    t.getFull_name(),
+                    "transient",
+                    client.getAdminName(t.getEmail().trim()),
+                    t.getBalance(),
+                    t.getAddress(),
+                    t.getAmountPaid()
+                });
+            }
+            
+            model = (DefaultTableModel) residentcontactinfotable.getModel();
+            model.getDataVector().removeAllElements();
+            model.fireTableDataChanged();
+            for(ResidentImpl r : client.getResidentBillingSummary()){
+                model.addRow(new Object[]{
+                    new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(r.getId())),
+                    r.getLName() + ", " + r.getFName(),
+                    client.getAdminName(r.getGender()),
+                    r.getAddress()
+                });
+            }
+            
+            model = (DefaultTableModel) residentaddresstable.getModel();
+            model.getDataVector().removeAllElements();
+            model.fireTableDataChanged();
+            for(TransientImpl t : client.getTransientBillingInfo()){
+                model.addRow(new Object[]{
+                    new SimpleDateFormat("MMMM dd, yyyy").format(new SimpleDateFormat("yyyy-MM-dd").parse(t.getBalance())),
+                    t.getFull_name(),
+                    client.getAdminName(t.getEmail().trim()),
+                    t.getAmountPaid()
+                });
+            }
+        } catch (RemoteException | ParseException | FileNotFoundException ex) {
+//            Logger.getLogger(BillingArchiveFrame.class.getName()).log(Level.SEVERE, null, ex);
+            new MessageDialog().error(this, ex.getMessage());
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        residentpersonalinfotable = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        residentaddresstable = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        residentcontactinfotable = new javax.swing.JTable();
+        tabletoExcel = new javax.swing.JButton();
+        tabletoPDF = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(new javax.swing.ImageIcon(getClass().getResource("billingarchive.png")).getImage());
+        setUndecorated(true);
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/181 (2).jpg"))); // NOI18N
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 13, -1, -1));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Billing Archive", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Rondalo", 0, 24))); // NOI18N
+
+        jButton1.setText("Export to Excel");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setBackground(new java.awt.Color(255, 255, 255));
+        jButton2.setText("Export to PDF");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jTabbedPane2.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane2StateChanged(evt);
+            }
+        });
+
+        residentpersonalinfotable.setAutoCreateRowSorter(true);
+        residentpersonalinfotable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Full Name", "Type", "Received By", "Control Number", "Mode of Payment", "Amount Paid"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        residentpersonalinfotable.setGridColor(new java.awt.Color(204, 204, 204));
+        residentpersonalinfotable.getTableHeader().setResizingAllowed(false);
+        residentpersonalinfotable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane2.setViewportView(residentpersonalinfotable);
+        if (residentpersonalinfotable.getColumnModel().getColumnCount() > 0) {
+            residentpersonalinfotable.getColumnModel().getColumn(1).setPreferredWidth(20);
+            residentpersonalinfotable.getColumnModel().getColumn(3).setPreferredWidth(20);
+            residentpersonalinfotable.getColumnModel().getColumn(4).setPreferredWidth(50);
+            residentpersonalinfotable.getColumnModel().getColumn(5).setPreferredWidth(20);
+        }
+
+        jTabbedPane2.addTab("Account Summary", jScrollPane2);
+
+        residentaddresstable.setAutoCreateRowSorter(true);
+        residentaddresstable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Date Paid", "Transient Name", "Received By", "Amount Paid"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        residentaddresstable.setGridColor(new java.awt.Color(204, 204, 204));
+        residentaddresstable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane5.setViewportView(residentaddresstable);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+        );
+
+        jTabbedPane2.addTab("Transient", jPanel3);
+
+        residentcontactinfotable.setAutoCreateRowSorter(true);
+        residentcontactinfotable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Date Paid", "Resident Name", "Received By", "Amount Paid"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        residentcontactinfotable.setGridColor(new java.awt.Color(204, 204, 204));
+        residentcontactinfotable.getTableHeader().setResizingAllowed(false);
+        residentcontactinfotable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane3.setViewportView(residentcontactinfotable);
+
+        jTabbedPane2.addTab("Resident", jScrollPane3);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 891, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(187, 187, 187)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, 453));
+
+        tabletoExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/excelicon.png"))); // NOI18N
+        tabletoExcel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabletoExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tabletoExcelActionPerformed(evt);
+            }
+        });
+        jPanel1.add(tabletoExcel, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 520, 67, -1));
+
+        tabletoPDF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/pdficon.png"))); // NOI18N
+        tabletoPDF.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tabletoPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tabletoPDFActionPerformed(evt);
+            }
+        });
+        jPanel1.add(tabletoPDF, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 520, 71, -1));
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Prev.png"))); // NOI18N
+        jLabel4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel4MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(913, 13, -1, -1));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 971, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 597, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        pack();
+        setLocationRelativeTo(null);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTabbedPane2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane2StateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTabbedPane2StateChanged
+
+    private void tabletoExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tabletoExcelActionPerformed
+       try {
+           ExcelExporter exp = new ExcelExporter();
+            String title = "";
+            if (jTabbedPane2.getSelectedIndex() == 0) {
+                exp.fillData(residentpersonalinfotable, new File(path+"\\EXCEL\\AccountSummaryBillingArchive.xls"));
+                title = "AccountSummary";
+            } else if (jTabbedPane2.getSelectedIndex() == 1) {
+                exp.fillData(residentaddresstable, new File(path+"\\EXCEL\\TransientBillingArchive.xls"));
+                title = "TransientBilling";
+            } else if (jTabbedPane2.getSelectedIndex() == 2) {
+                exp.fillData(residentcontactinfotable, new File(path+"\\EXCEL\\ResidentBillingArchive.xls"));
+                title = "ResidentBilling";
+            }
+            JOptionPane.showMessageDialog(null, "Data saved at " + path
+                    + "'\\PDF\\"+title+"BillingArchive.xls' successfully", "Message",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+//            ex.printStackTrace();
+            new MessageDialog().error(this, ex.getMessage());
+        }
+    }//GEN-LAST:event_tabletoExcelActionPerformed
+
+    private void tabletoPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tabletoPDFActionPerformed
+        // TODO add your handling code here:
+        String title = "";
+        if (jTabbedPane2.getSelectedIndex() == 0) {
+            model = (DefaultTableModel) residentpersonalinfotable.getModel();
+            title = "AccountSummary";
+        } else if (jTabbedPane2.getSelectedIndex() == 1) {
+            model = (DefaultTableModel) residentaddresstable.getModel();
+            title = "transientBilling";
+        } else if (jTabbedPane2.getSelectedIndex() == 2) {
+            model = (DefaultTableModel) residentcontactinfotable.getModel();
+            title = "residentBilling";
+        }
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(path+"\\PDF\\"+title+"BillingArchive.pdf"));
+            document.open();
+            model = (DefaultTableModel) residentpersonalinfotable.getModel();
+            PdfPTable tab=new PdfPTable(model.getColumnCount());
+            for(int i = 0; i<model.getColumnCount();i++){
+                tab.addCell(model.getColumnName(i));
+            }
+            for (int i = 0; i < model.getRowCount(); i++) {
+                for (int j = 0; j < model.getColumnCount(); j++) {
+                    if(model.getValueAt(i, j) != null){
+                        tab.addCell(model.getValueAt(i, j).toString());
+                    } else {
+                        tab.addCell("-");
+                    }
+                }
+            }
+            document.add(tab);
+
+            JOptionPane.showMessageDialog(null, "Data saved at " + path+
+                "'\\PDF\\BillingArchive.pdf' successfully", "Message",
+                JOptionPane.INFORMATION_MESSAGE);
+            document.close();
+
+        } catch (FileNotFoundException | DocumentException ex) {
+            new MessageDialog().error(this, ex.getMessage());
+        }
+    }//GEN-LAST:event_tabletoPDFActionPerformed
+
+    private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
+        this.dispose();
+        new ArchivesMenu(client,user).setVisible(true);
+    }//GEN-LAST:event_jLabel4MouseClicked
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Windows".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(BillingArchiveFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(BillingArchiveFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(BillingArchiveFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(BillingArchiveFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    new BillingArchiveFrame(null,null).setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(BillingArchiveFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTable residentaddresstable;
+    private javax.swing.JTable residentcontactinfotable;
+    private javax.swing.JTable residentpersonalinfotable;
+    private javax.swing.JButton tabletoExcel;
+    private javax.swing.JButton tabletoPDF;
+    // End of variables declaration//GEN-END:variables
+}
